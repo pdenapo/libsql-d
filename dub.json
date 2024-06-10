@@ -1,0 +1,10 @@
+{
+	"authors": [
+		"Pablo De Napoli"
+	],
+	"copyright": "Copyright © 2023, Pablo De Napoli",
+	"description": "A minimal D application.",
+	"license": "MIT",
+	"name": "d_bindings_example",
+	"lflags": ["-Bstatic","/home/pablo/git-repos/libsql/target/debug/libsql_experimental.a","-Bdynamic","-lm"]
+}

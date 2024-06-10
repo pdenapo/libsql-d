@@ -1,6 +1,7 @@
 # Compiled Object files
 *.o
 *.obj
+*.exe
 
 # Compiled Dynamic libraries
 *.so
@@ -22,3 +23,15 @@ docs/
 
 # Code coverage
 *.lst
+
+
+/d_bindings_example
+d_bindings_example.so
+d_bindings_example.dylib
+d_bindings_example.dll
+d_bindings_example.a
+d_bindings_example.lib
+d_bindings_example-test-*
+
+
+
