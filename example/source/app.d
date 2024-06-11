@@ -1,10 +1,9 @@
-import std.string;
 import core.stdc.stdio;
 import libsql_deimos;
 
 int main()
 {
-libsql_connection_t conn;
+	libsql_connection_t conn;
 	libsql_rows_t rows;
 	libsql_row_t row;
 	libsql_database_t db;

@@ -15,5 +15,9 @@ Then build it with
 
   dub build 
 
+## Testing
 
+We use [Silly](https://code.dlang.org/packages/silly) for testing. You can run the tests using 
+
+dub test
 

@@ -3,10 +3,25 @@
 		"Pablo De Napoli"
 	],
 	"copyright": "Copyright © 2023, Pablo De Napoli",
+	"dependencies": {
+		"silly": "~>1.1.1"
+	},
 	"description": "D bindings for libsql.",
+	"lflags": [
+		"-Bstatic",
+		"$LIBSQL_PATH",
+		"-Bdynamic"
+	],
 	"license": "MIT",
 	"name": "libsql-d",
-	"lflags": ["-Bstatic","$LIBSQL_PATH","-Bdynamic"],
-	"targetType": "library",
-	"targetName": "sql-d"
+	 "configurations": [
+		{
+			"name": "library",
+			 "targetName": "sql-d",
+			"targetType": "library",
+		},
+		{
+			"name": "unittest"
+		}
+	]
 }
