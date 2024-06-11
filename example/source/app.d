@@ -1,4 +1,3 @@
-import std.stdio;
 import std.string;
 import core.stdc.stdio;
 import libsql_deimos;
@@ -20,7 +19,6 @@ libsql_connection_t conn;
 		fprintf( core.stdc.stdio.stderr, "%s\n", err);
 		goto quit;
 	}
-	writeln("db=",db);
 
   retval = libsql_connect(db, &conn, &err);
 	if (retval != 0) {
@@ -28,7 +26,6 @@ libsql_connection_t conn;
 		//stderr.writeln(err);
 		goto quit;
 	}
-	writeln("conn=",conn);
 
 	retval = libsql_query(conn, "SELECT 1", &rows, &err);
 	if (retval != 0) {
@@ -68,7 +65,6 @@ libsql_connection_t conn;
 		libsql_disconnect(conn);
 		libsql_close(db);
 
-		//writeln("retval=",retval);
 		fprintf(core.stdc.stdio.stderr, "retval=%d \n", retval);
 		return retval;
 }

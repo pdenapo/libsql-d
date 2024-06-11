@@ -1,0 +1,16 @@
+{
+	"authors": [
+		"Pablo De Napoli"
+	],
+	"copyright": "Copyright © 2023, Pablo De Napoli",
+	"description": "An example application for libsql-d.",
+	"license": "MIT",
+	"name": "libsql-d-example",
+	"targetType": "executable",
+	"dependencies":
+	{
+	 "libsql-d":{
+		"path":"../"
+	 }
+	}
+}

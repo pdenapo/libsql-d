@@ -3,8 +3,10 @@
 		"Pablo De Napoli"
 	],
 	"copyright": "Copyright © 2023, Pablo De Napoli",
-	"description": "A minimal D application.",
+	"description": "D bindings for libsql.",
 	"license": "MIT",
-	"name": "d_bindings_example",
-	"lflags": ["-Bstatic","/home/pablo/git-repos/libsql/target/debug/libsql_experimental.a","-Bdynamic","-lm"]
+	"name": "libsql-d",
+	"lflags": ["-Bstatic","$LIBSQL_PATH","-Bdynamic"],
+	"targetType": "library",
+	"targetName": "sql-d"
 }
