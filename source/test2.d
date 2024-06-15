@@ -1,6 +1,8 @@
 import libsql_deimos;
+import libsql_json;
 import core.stdc.stdio;
 import std.string;
+import std.stdio;
 
 @("Persons")
 unittest {
@@ -87,6 +89,8 @@ unittest {
 		err = null;
 	}
  assert(retval == 0);
+
+ writeln(rows_to_Json(rows));
 
  quit:
 	libsql_free_rows(rows);

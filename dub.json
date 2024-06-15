@@ -2,9 +2,21 @@
 	"authors": [
 		"Pablo De Napoli"
 	],
+	"configurations": [
+		{
+			"name": "library",
+			"targetName": "sql-d",
+			"targetType": "library"
+		},
+		{
+			"name": "unittest",
+			"targetType": "library"
+		}
+	],
 	"copyright": "Copyright © 2023, Pablo De Napoli",
 	"dependencies": {
-		"silly": "~>1.1.1"
+		"silly": "~>1.1.1",
+		"vibe-d:data": "~>0.10.0"
 	},
 	"description": "D bindings for libsql.",
 	"lflags": [
@@ -13,15 +25,5 @@
 		"-Bdynamic"
 	],
 	"license": "MIT",
-	"name": "libsql-d",
-	 "configurations": [
-		{
-			"name": "library",
-			 "targetName": "sql-d",
-			"targetType": "library",
-		},
-		{
-			"name": "unittest"
-		}
-	]
+	"name": "libsql-d"
 }
