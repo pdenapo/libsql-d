@@ -46,6 +46,14 @@ Json rows_to_Json(libsql_rows_t rows)
 					fprintf(core.stdc.stdio.stderr, "%s\n", err);
 				}
 				json_row[col_name_string] = Json(value);
+				break;
+			case LIBSQL_FLOAT:
+				double value;
+				retval = libsql_get_float(row, col, &value, &err);
+				if (retval != 0) {
+					fprintf(core.stdc.stdio.stderr, "%s\n", err);
+				}
+				json_row[col_name_string] = Json(value);
 				break;	
 			case LIBSQL_TEXT:
 				char* value;
@@ -55,6 +63,9 @@ Json rows_to_Json(libsql_rows_t rows)
 					fprintf(core.stdc.stdio.stderr, "%s\n", err);
 				}
 				json_row[col_name_string] = Json(to!string(value));
+				break;
+			case LIBSQL_NULL:
+				json_row[col_name_string] = Json(null);
 				break;
 			default:
 				assert(false);
