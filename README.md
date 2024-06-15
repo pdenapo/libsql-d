@@ -21,3 +21,11 @@ We use [Silly](https://code.dlang.org/packages/silly) for testing. You can run t
 
 dub test
 
+By default, the tests uses the in memory database, but you can use  a different 
+one by setting the LIBSQL_URL environment variable. For instance, run
+
+  turso dev 
+
+and set 
+
+  export LIBSQL_URL="http://127.0.0.1:8080"
