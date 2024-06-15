@@ -1,4 +1,3 @@
-module source.test3;
 
 import libsql_deimos;
 import libsql_json;
@@ -9,7 +8,7 @@ import vibe.data.json;
 import std.conv;
 import std.process:environment;
 
-@("Persons with Json")
+@("Persons with prepared statements")
 unittest
 {
 
@@ -33,7 +32,7 @@ unittest
 
 	void insert_person(Person p)
 	{
-		const sql = "INSERT INTO Persons3 VALUES ('" ~ p.name ~ "'," ~ to!string(
+		const sql = "INSERT INTO Persons4 VALUES ('" ~ p.name ~ "'," ~ to!string(
 			p.age) ~ "," ~ to!string(p.height) ~",'" ~ to!string(p.hobby) ~ "');";
 		writeln(sql);
 		retval = libsql_execute(conn, toStringz(sql), &err);
@@ -45,7 +44,7 @@ unittest
 	}
 
 	const string url= environment.get("LIBSQL_URL",":memory:");
-
+	writeln("url=",url);
 	//retval = libsql_open_ext(toStringz(url), &db, &err);
 	retval = libsql_open_remote(toStringz(url),toStringz(""), &db, &err);	
 	if (retval != 0)
@@ -61,7 +60,7 @@ unittest
 	}
 	assert(retval == 0);
 
-	const string create_table = "CREATE TABLE Persons3(
+	const string create_table = "CREATE TABLE Persons4(
 	name TEXT,
 	age INTEGER,
 	height REAL,
@@ -71,6 +70,12 @@ unittest
 	retval = libsql_execute(conn, toStringz(create_table), &err);
 	assert(retval == 0);
 
+	libsql_stmt_t insert_stemt;
+	const char* sql_insert = "INSERT INTO Persons4 VALUES ($,$,$,$);";
+
+	retval=libsql_prepare(conn, sql_insert,  &insert_stemt, &err);
+
+
 	people[0] = Person("Paul", 20, 174.5,"chess");
 	people[1] = Person("Laura", 30, 161.0,"dancing");
 	foreach (p; people)
@@ -78,7 +83,7 @@ unittest
 		insert_person(p);
 	}
 
-	retval = libsql_query(conn, "SELECT * FROM Persons3;", &rows, &err);
+	retval = libsql_query(conn, "SELECT * FROM Persons4;", &rows, &err);
 	if (retval != 0)
 	{
 		fprintf(core.stdc.stdio.stderr, "%s\n", err);
