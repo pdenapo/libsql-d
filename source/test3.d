@@ -1,7 +1,8 @@
 module source.test3;
 
-import libsql_deimos;
-import libsql_json;
+import libsql.deimos;
+import libsql.json;
+import libsql.utils;
 import core.stdc.stdio;
 import std.string:toStringz;
 import std.stdio;
@@ -28,39 +29,24 @@ unittest
 	char* err = null;
 	int retval = 0;
 	libsql_rows_t rows;
-	libsql_row_t row;
-	int num_cols;
 
-	void insert_person(Person p)
+	void insert_person(Person p, LibsqlClient client)
 	{
 		const sql = "INSERT INTO Persons3 VALUES ('" ~ p.name ~ "'," ~ to!string(
 			p.age) ~ "," ~ to!string(p.height) ~",'" ~ to!string(p.hobby) ~ "');";
-		writeln(sql);
-		retval = libsql_execute(conn, toStringz(sql), &err);
-		if (retval != 0)
-		{
-			fprintf(core.stdc.stdio.stderr, "%s\n", err);
-		}
-		assert(retval == 0);
+		client.execute(sql); 
 	}
 
 	const string url= environment.get("LIBSQL_URL",":memory:");
+	writeln("url=",url);
 
-	//retval = libsql_open_ext(toStringz(url), &db, &err);
-	retval = libsql_open_remote(toStringz(url),toStringz(""), &db, &err);	
-	if (retval != 0)
-	{
-		fprintf(core.stdc.stdio.stderr, "%s\n", err);
-	}
-	assert(retval == 0);
+	const auth_token=  environment.get("LIBSQL_AUTH_TOKEN","");
+	
+	auto client= new LibsqlClient(url,auth_token);
 
-	retval = libsql_connect(db, &conn, &err);
-	if (retval != 0)
-	{
-		fprintf(core.stdc.stdio.stderr, "%s\n", err);
-	}
-	assert(retval == 0);
-
+  const string drop_table="DROP TABLE IF EXISTS Persons;";
+	client.execute(drop_table);
+  
 	const string create_table = "CREATE TABLE Persons3(
 	name TEXT,
 	age INTEGER,
@@ -68,24 +54,18 @@ unittest
 	hobby TEXT
 	);";
 
-	retval = libsql_execute(conn, toStringz(create_table), &err);
-	assert(retval == 0);
+	client.execute(create_table);
 
 	people[0] = Person("Paul", 20, 174.5,"chess");
 	people[1] = Person("Laura", 30, 161.0,"dancing");
 	foreach (p; people)
 	{
-		insert_person(p);
+		insert_person(p,client);
 	}
 
-	retval = libsql_query(conn, "SELECT * FROM Persons3;", &rows, &err);
-	if (retval != 0)
-	{
-		fprintf(core.stdc.stdio.stderr, "%s\n", err);
-	}
-	assert(retval == 0);
+	auto query_result =client.query("SELECT * FROM Persons3;");
 	
-	Json json_rows = rows_to_Json(rows);
+	Json json_rows = rows_to_Json(query_result.rows);
 	writeln(json_rows);
 	int i = 0;
 	foreach (json_row; json_rows)
@@ -96,8 +76,5 @@ unittest
 		i++;
 	}
 
-quit:
 	libsql_free_rows(rows);
-	libsql_disconnect(conn);
-	libsql_close(db);
 }

@@ -1,12 +1,14 @@
 
-import libsql_deimos;
-import libsql_json;
+import libsql.deimos;
+import libsql.json;
+import libsql.utils;
 import core.stdc.stdio;
 import std.string:toStringz;
 import std.stdio;
 import vibe.data.json;
 import std.conv;
 import std.process:environment;
+
 
 @("Persons with prepared statements")
 unittest
@@ -27,8 +29,6 @@ unittest
 	char* err = null;
 	int retval = 0;
 	libsql_rows_t rows;
-	libsql_row_t row;
-	int num_cols;
 
 	void insert_person(Person p)
 	{
@@ -45,8 +45,7 @@ unittest
 
 	const string url= environment.get("LIBSQL_URL",":memory:");
 	writeln("url=",url);
-	//retval = libsql_open_ext(toStringz(url), &db, &err);
-	retval = libsql_open_remote(toStringz(url),toStringz(""), &db, &err);	
+	retval = libsql_open_any(url,"", &db, &err);	
 	if (retval != 0)
 	{
 		fprintf(core.stdc.stdio.stderr, "%s\n", err);
@@ -59,6 +58,16 @@ unittest
 		fprintf(core.stdc.stdio.stderr, "%s\n", err);
 	}
 	assert(retval == 0);
+
+	
+ const string drop_table="DROP TABLE IF EXISTS Persons;";
+ std.stdio.stderr.writeln(drop_table);
+ retval = libsql_execute(conn,toStringz(drop_table), &err);
+ if (retval != 0) {
+		fprintf(core.stdc.stdio.stderr, "%s\n", err);
+	}
+	assert(retval == 0);
+
 
 	const string create_table = "CREATE TABLE Persons4(
 	name TEXT,

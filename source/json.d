@@ -1,5 +1,5 @@
-module libsql_json;
-import libsql_deimos;
+module libsql.json;
+import libsql.deimos;
 import vibe.data.json;
 import core.stdc.stdio;
 import std.conv;

@@ -1,9 +1,11 @@
-import libsql_deimos;
+import libsql.deimos;
+import libsql.utils;
 
 import core.stdc.stdio;
 import std.string:toStringz;
 import std.stdio;
 import std.process:environment;
+import std.conv;
 
 @("Persons")
 unittest {
@@ -15,10 +17,9 @@ unittest {
 	libsql_row_t row;
 	int num_cols;
 
-  const string url= environment.get("LIBSQL_URL",":memory:");	
-  writeln("url=",url);
-  retval = libsql_open_ext(toStringz(url), &db, &err);
-  //retval = libsql_open_remote(toStringz(url),toStringz(""), &db, &err);	
+	const string url= environment.get("LIBSQL_URL",":memory:");
+	writeln("url=",url);
+	retval = libsql_open_any(url,"", &db, &err);	
   if (retval != 0) {
 		fprintf( core.stdc.stdio.stderr, "%s\n", err);
 	}
@@ -30,14 +31,26 @@ unittest {
 	}
   assert(retval == 0);
 
+ 
+ const string drop_table="DROP TABLE IF EXISTS Persons;";
+ std.stdio.stderr.writeln(drop_table);
+ retval = libsql_execute(conn,toStringz(drop_table), &err);
+ if (retval != 0) {
+		fprintf(core.stdc.stdio.stderr, "%s\n", err);
+		throw new Exception("DROP TABLE :" ~ to!string(err));
+	}
+
  const string create_table="CREATE TABLE Persons2(
 	Name TEXT,
 	Age INTEGER
 	);";
 
   retval = libsql_execute(conn,toStringz(create_table), &err);
-  assert(retval == 0);
-
+  if (retval != 0) {
+		fprintf(core.stdc.stdio.stderr, "%s\n", err);
+		throw new Exception("CREATE TABLE :" ~ to!string(err));
+	}
+  
 	const insert_person="INSERT INTO Persons2 VALUES ('Paul',20);";
 
 	retval = libsql_execute(conn,toStringz(insert_person), &err);

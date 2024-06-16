@@ -1,4 +1,5 @@
-import libsql_deimos;
+import libsql.deimos;
+import libsql.utils;
 import core.stdc.stdio;
 import std.process:environment;
 import std.string:toStringz;
@@ -14,10 +15,10 @@ unittest {
 	libsql_row_t row;
 	int num_cols;
 
-  const string url= environment.get("LIBSQL_URL",":memory:");
-  writeln("url=",url);	
-  retval = libsql_open_ext(toStringz(url), &db, &err);
-  //retval = libsql_open_remote(toStringz(url),toStringz(""), &db, &err);	
+
+	const string url= environment.get("LIBSQL_URL",":memory:");
+	writeln("url=",url);
+	retval = libsql_open_any(url,"", &db, &err);	
 
   if (retval != 0)
 	{
