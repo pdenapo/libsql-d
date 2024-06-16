@@ -18,8 +18,10 @@ unittest {
 
 	const string url= environment.get("LIBSQL_URL",":memory:");
 	writeln("url=",url);
-	retval = libsql_open_any(url,"", &db, &err);	
+	const auth_token=  environment.get("LIBSQL_AUTH_TOKEN","");
 
+	retval = libsql_open_any(url,auth_token, &db, &err);	
+	
   if (retval != 0)
 	{
    fprintf(core.stdc.stdio.stderr, "retval=%d\n%s\n", retval,err);

@@ -21,7 +21,10 @@ unittest {
 
 	const string url= environment.get("LIBSQL_URL",":memory:");
 	writeln("url=",url);
-	retval = libsql_open_any(url,"", &db, &err);	
+
+	const auth_token=  environment.get("LIBSQL_AUTH_TOKEN","");
+
+	retval = libsql_open_any(url,auth_token, &db, &err);	
   if (retval != 0) {
 		fprintf( core.stdc.stdio.stderr, "%s\n", err);
 	}
@@ -34,7 +37,7 @@ unittest {
   assert(retval == 0);
 
  
- const string drop_table="DROP TABLE IF EXISTS Persons;";
+ const string drop_table="DROP TABLE IF EXISTS Persons2;";
  std.stdio.stderr.writeln(drop_table);
  retval = libsql_execute(conn,toStringz(drop_table), &err);
  if (retval != 0) {
