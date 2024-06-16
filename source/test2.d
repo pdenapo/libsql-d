@@ -7,6 +7,8 @@ import std.stdio;
 import std.process:environment;
 import std.conv;
 
+// A more realistic test, still using the C API.
+
 @("Persons")
 unittest {
 	libsql_database_t db;

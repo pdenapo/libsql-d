@@ -56,7 +56,7 @@ class LibsqlClient {
 				}
 	}
 
-	QueryResult query(string statement){
+	 libsql_rows_t query(string statement){
 	 	writeln(statement);
 		 char* err;
 		 libsql_rows_t rows;
@@ -64,7 +64,8 @@ class LibsqlClient {
 		 if (retval != 0) {
 				throw new Exception(to!string(err));
 			}
-		 return QueryResult(rows); 
+		 //return QueryResult(rows);
+		 return rows; 
 	}
 	
 }

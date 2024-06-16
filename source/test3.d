@@ -1,3 +1,4 @@
+
 module source.test3;
 
 import libsql.deimos;
@@ -10,7 +11,9 @@ import vibe.data.json;
 import std.conv;
 import std.process:environment;
 
-@("Persons with Json")
+// Test using some D constructions
+
+@("Persons with D")
 unittest
 {
 
@@ -63,9 +66,9 @@ unittest
 		insert_person(p,client);
 	}
 
-	auto query_result =client.query("SELECT * FROM Persons3;");
+	rows=client.query("SELECT * FROM Persons3;");
 	
-	Json json_rows = rows_to_Json(query_result.rows);
+	Json json_rows = rows_to_Json(rows);
 	writeln(json_rows);
 	int i = 0;
 	foreach (json_row; json_rows)
