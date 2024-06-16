@@ -27,11 +27,12 @@ unittest
 
 	Person[2] people;
 
-	libsql_database_t db;
-	libsql_connection_t conn;
-	char* err = null;
-	int retval = 0;
 	libsql_rows_t rows;
+
+	libsql_stmt_t insert_stmt;
+
+	int libsql_prepare(libsql_connection_t conn, const char *sql, libsql_stmt_t *out_stmt, const char **out_err_msg);
+
 
 	void insert_person(Person p, LibsqlClient client)
 	{
