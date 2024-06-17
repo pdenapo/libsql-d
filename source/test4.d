@@ -48,23 +48,22 @@ unittest
 
 	client.execute(create_table);
 
-	libsql_stmt_t insert_stmt;
 	char *err;
 
-	const insert_sql = "INSERT INTO Persons4 VALUES (?,?,?,?)";
-
-	int retval=libsql_prepare(client.conn, toStringz(insert_sql), &insert_stmt, &err);
-	if (retval != 0) throw new Exception("libsql_prepare error:"~ to!string(err));
-
-	
 	void insert_person(Person p)
 	{
 		//const sql = "INSERT INTO Persons4 VALUES ('" ~ p.name ~ "'," ~ to!string(
 		//	p.age) ~ "," ~ to!string(p.height) ~",'" ~ to!string(p.hobby) ~ "');";
 
-		debug writeln("insert_person",p);
+		libsql_stmt_t insert_stmt;
 		char* err;
-		int retval=libsql_bind_string(insert_stmt,1, toStringz(p.name), &err);
+		
+		debug writeln("insert_person",p);
+		const insert_sql = "INSERT INTO Persons4 VALUES (?,?,?,?)";
+		int retval=libsql_prepare(client.conn, toStringz(insert_sql), &insert_stmt, &err);
+		if (retval != 0) throw new Exception("libsql_prepare error:"~ to!string(err));
+
+		retval=libsql_bind_string(insert_stmt,1, toStringz(p.name), &err);
 		if (retval != 0) throw new Exception("libsql_bind_string:"~ to!string(err));
 		
 		retval=libsql_bind_int(insert_stmt,2, p.age, &err);
@@ -79,8 +78,9 @@ unittest
 		retval= libsql_execute_stmt(insert_stmt, &err);
 		if (retval != 0) throw new Exception("libsql_execute_stmt:"~ to!string(err));
 
-		retval= libsql_reset_stmt(insert_stmt, &err);
-		if (retval != 0) throw new Exception("libsql_reset_stmt:"~ to!string(err));
+		//retval= libsql_reset_stmt(insert_stmt, &err);
+		//if (retval != 0) throw new Exception("libsql_reset_stmt:"~ to!string(err));
+		libsql_free_stmt(insert_stmt);
 
 	}
 
@@ -106,5 +106,5 @@ unittest
 	}
 
 	libsql_free_rows(rows);
-	libsql_free_stmt(insert_stmt);
+	
 }
