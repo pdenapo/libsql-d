@@ -1,5 +1,5 @@
 
-module source.test4;
+module source.test_ps;
 
 import libsql.deimos;
 import libsql.json;
