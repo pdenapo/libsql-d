@@ -15,7 +15,7 @@ import std.datetime.date;
 
 // Test using some D constructions
 
-@("Persons with D and prepared statements and traits")
+@("orm: Persons with D and prepared statements and traits")
 unittest
 {
 
@@ -27,7 +27,8 @@ unittest
 		string hobby;
 		Date bithday;
 		DateTime test;
-		//bool married; // TODO: support boolean
+		bool married;
+		uint test_uint; 
 	}
 
 	Person[2] people;
@@ -46,29 +47,50 @@ unittest
 
   client.create_table!Person("Persons5");
   
-	//people[0] = Person("Paul", 52, 174.5,"chess",Date(1972,3,1), DateTime(2000, 6, 1, 10, 30, 0),true);
-	//people[1] = Person("Laura",49, 161.0,"dancing",Date(1975,8,6),DateTime(2001, 7, 1, 11, 32, 5),false);
+	people[0] = Person("Paul", 52, 174.5,"chess",Date(1972,3,1), DateTime(2000, 6, 1, 10, 30, 0),true,3);
+	people[1] = Person("Laura",49, 161.0,"dancing",Date(1975,8,6),DateTime(2001, 7, 1, 11, 32, 5),false,5);
 
-  people[0] = Person("Paul", 52, 174.5,"chess",Date(1972,3,1), DateTime(2000, 6, 1, 10, 30, 0));
-	people[1] = Person("Laura",49, 161.0,"dancing",Date(1975,8,6),DateTime(2001, 7, 1, 11, 32, 5));
 	
-	foreach (p; people)
+foreach (p; people)
 	{
 		client.insert!Person(p,"Persons5");
 	}
 
 	rows=client.query("SELECT * FROM Persons5;");
-	
-	Json json_rows = rows_to_Json(rows);
-	writeln(json_rows);
-	int i = 0;
-	foreach (json_row; json_rows)
+
+
+	int retval;
+	char* err;
+	libsql_row_t row;
+	int i=0;
+
+	while ((retval = libsql_next_row(rows, &row, &err)) == 0)
 	{
-		Person someone = deserializeJson!Person(json_row);
-		assert(someone == people[i]);
+ 	Person someone;
+	 if (retval != 0)
+		{
+			throw new Exception(to!string(err));
+		}
+		if (!row)
+			break;
+		someone= client.get!Person(row);
 		writeln(someone);
+		assert(someone == people[i]);
 		i++;
 	}
+
+
+	
+	// Json json_rows = rows_to_Json(rows);
+	// writeln(json_rows);
+	// int i = 0;
+	// foreach (json_row; json_rows)
+	// {
+	// 	Person someone = deserializeJson!Person(json_row);
+	// 	assert(someone == people[i]);
+	// 	writeln(someone);
+	// 	i++;
+	// }
 
 	libsql_free_rows(rows);
 	

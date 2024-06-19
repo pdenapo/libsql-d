@@ -42,26 +42,19 @@ Json rows_to_Json(libsql_rows_t rows)
 			case LIBSQL_INT:
 				long value;
 				retval = libsql_get_int(row, col, &value, &err);
-				if (retval != 0) {
-					fprintf(core.stdc.stdio.stderr, "%s\n", err);
-				}
+				if (retval != 0) throw new Exception("libsql_get_int:"~ to!string(err));
 				json_row[col_name_string] = Json(value);
 				break;
 			case LIBSQL_FLOAT:
 				double value;
 				retval = libsql_get_float(row, col, &value, &err);
-				if (retval != 0) {
-					fprintf(core.stdc.stdio.stderr, "%s\n", err);
-				}
+				if (retval != 0) throw new Exception("libsql_get_float:"~ to!string(err));
 				json_row[col_name_string] = Json(value);
 				break;	
 			case LIBSQL_TEXT:
 				char* value;
 				retval = libsql_get_string(row, col, &value, &err);
-				if (retval != 0)
-				{
-					fprintf(core.stdc.stdio.stderr, "%s\n", err);
-				}
+				if (retval != 0) throw new Exception("libsql_get_string:"~ to!string(err));
 				json_row[col_name_string] = Json(to!string(value));
 				break;
 			case LIBSQL_NULL:

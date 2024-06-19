@@ -61,8 +61,8 @@ class LibsqlClient {
 	  foreach(i,member;__traits(allMembers, T))
     {
 					if (i>0) sql ~=",";
-					sql ~= member; 
-					static if (is(typeof(__traits(getMember, T, member))==int))
+					sql ~= member;
+					static if (__traits(isIntegral,typeof(__traits(getMember, T, member)))) 
 					{
 						sql ~=  " INTEGER NOT NULL ";   
 					}
@@ -102,23 +102,30 @@ class LibsqlClient {
 
     foreach(i,member;__traits(allMembers, T))
     {
-    			//debug writeln(member,"=",__traits(getMember, p, member)," ",typeof(__traits(getMember, p, member)).stringof);
-					static if (is(typeof(__traits(getMember, p, member))==int))
+    			debug writeln(member,"=",__traits(getMember, p, member)," ",typeof(__traits(getMember, p, member)).stringof);
+					
+					// Integral types are represented using INTEGER 
+					
+					static if (__traits(isIntegral,typeof(__traits(getMember, p, member))))
 					{
-					  retval=libsql_bind_int(insert_stmt,i+1,__traits(getMember, p, member) , &err);
+					  debug writeln("orm: ",member, "->INTEGER");
+					  retval=libsql_bind_int(insert_stmt,i+1,to!long(__traits(getMember, p, member)), &err);
 					}
 					else static if (is(typeof(__traits(getMember, p, member))==double))
 					{
 						retval=libsql_bind_float(insert_stmt,i+1,  __traits(getMember, p, member), &err);
+						debug writeln("orm: ",member, "->FLOAT" );
 					}
 					else static if (is(typeof(__traits(getMember, p, member))==Date)||
 													is(typeof(__traits(getMember, p, member))==DateTime))
 					{
 						retval=libsql_bind_string(insert_stmt,i+1, toStringz( __traits(getMember, p, member).toISOExtString()), &err);
+						debug writeln("orm: ",member, "-> ExtString" );
 					}
 					else //static if (is(typeof(__traits(getMember, p, member))==string))
 					{
 						retval=libsql_bind_string(insert_stmt,i+1, toStringz(to!string(__traits(getMember, p, member))), &err);
+						debug writeln("orm: ",member, "->STRING");
 					}
 					if (retval != 0) throw new Exception("insert:"~ to!string(err));
     }
@@ -130,6 +137,67 @@ class LibsqlClient {
 		//if (retval != 0) throw new Exception("libsql_reset_stmt:"~ to!string(err));
 		libsql_free_stmt(insert_stmt);
 
+	}
+
+	T get(T)(libsql_row_t row)
+	{
+		T result;
+		int retval;
+		int col=0;
+		char* err;
+
+    foreach(i,member;__traits(allMembers, T))
+    {
+    			
+					
+					// Integral types are represented using INTEGER 
+					
+					static if (__traits(isIntegral,typeof(__traits(getMember, T, member))))
+					{
+	  				long value;
+						retval = libsql_get_int(row, col, &value, &err);
+						if (retval != 0) throw new Exception("libsql_get_int:"~ to!string(err));
+						__traits(getMember, result, member) = cast(typeof(__traits(getMember, T, member))) value;
+					}
+					else static if (is(typeof(__traits(getMember, T, member))==double))
+					{
+							double value;
+							retval = libsql_get_float(row, col, &value, &err);
+						  if (retval != 0) throw new Exception("libsql_get_float:"~ to!string(err));
+							__traits(getMember, result, member) = cast(typeof(__traits(getMember, T, member))) value;
+					}
+					// else static if (is(typeof(__traits(getMember, p, member))==Date)||
+					// 								is(typeof(__traits(getMember, p, member))==DateTime))
+					// {
+					// 	retval=libsql_bind_string(insert_stmt,i+1, toStringz( __traits(getMember, p, member).toISOExtString()), &err);
+					// 	debug writeln("orm: ",member, "-> ExtString" );
+					// }
+					 else static if (is(typeof(__traits(getMember, T, member))==string))
+					 {
+					 	char* value;
+						retval = libsql_get_string(row, col, &value, &err);
+						if (retval != 0) throw new Exception("libsql_get_string:"~ to!string(err));
+						__traits(getMember, result, member) = to!string(value);
+					 }
+					 else static if (is(typeof(__traits(getMember, T, member))==Date))
+					 {
+					 	char* value;
+						retval = libsql_get_string(row, col, &value, &err);
+						if (retval != 0) throw new Exception("libsql_get_string:"~ to!string(err));
+						__traits(getMember, result, member) = Date.fromISOExtString(to!string(value));
+					 }
+					 else static if (is(typeof(__traits(getMember, T, member))==DateTime))
+					 {
+					 	char* value;
+						retval = libsql_get_string(row, col, &value, &err);
+						if (retval != 0) throw new Exception("libsql_get_string:"~ to!string(err));
+						__traits(getMember, result, member) = DateTime.fromISOExtString(to!string(value));
+					 }
+
+					col++;
+    }
+		
+		return result;
 	}
 
 }
