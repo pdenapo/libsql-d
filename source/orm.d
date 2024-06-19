@@ -6,6 +6,7 @@ import std.stdio;
 //import std.algorithm:startsWith;
 import std.string:toStringz;
 import std.conv;
+import std.datetime.date;
 
 class LibsqlClient {
 	libsql_database_t db;
@@ -65,13 +66,14 @@ class LibsqlClient {
 					{
 						sql ~=  " INTEGER NOT NULL ";   
 					}
-					else static if (is(typeof(__traits(getMember, T, member))==string))
-					{
-						sql ~=  " TEXT NOT NULL ";
-					}
 					else static if (is(typeof(__traits(getMember, T, member))==double))
 					{
 						sql ~=  " REAL NOT NULL ";
+					}
+					else					
+					//else static if (is(typeof(__traits(getMember, T, member))==string))
+					{
+						sql ~=  " TEXT NOT NULL ";
 					}
     }
 		sql ~= ");";
@@ -80,10 +82,6 @@ class LibsqlClient {
 
 	void insert (T)(T p, string table)
 	{
-		//const sql = "INSERT INTO Persons4 VALUES ('" ~ p.name ~ "'," ~ to!string(
-		//	p.age) ~ "," ~ to!string(p.height) ~",'" ~ to!string(p.hobby) ~ "');";
-
-		
 		libsql_stmt_t insert_stmt;
 		char* err;
 		
@@ -108,17 +106,21 @@ class LibsqlClient {
 					static if (is(typeof(__traits(getMember, p, member))==int))
 					{
 					  retval=libsql_bind_int(insert_stmt,i+1,__traits(getMember, p, member) , &err);
-						if (retval != 0) throw new Exception("libsql_bind_int:"~ to!string(err));
-					}
-					else static if (is(typeof(__traits(getMember, p, member))==string))
-					{
-						retval=libsql_bind_string(insert_stmt,i+1, toStringz(__traits(getMember, p, member)), &err);
-  					if (retval != 0) throw new Exception("libsql_bind_string:"~ to!string(err));
 					}
 					else static if (is(typeof(__traits(getMember, p, member))==double))
 					{
 						retval=libsql_bind_float(insert_stmt,i+1,  __traits(getMember, p, member), &err);
 					}
+					else static if (is(typeof(__traits(getMember, p, member))==Date)||
+													is(typeof(__traits(getMember, p, member))==DateTime))
+					{
+						retval=libsql_bind_string(insert_stmt,i+1, toStringz( __traits(getMember, p, member).toISOExtString()), &err);
+					}
+					else //static if (is(typeof(__traits(getMember, p, member))==string))
+					{
+						retval=libsql_bind_string(insert_stmt,i+1, toStringz(to!string(__traits(getMember, p, member))), &err);
+					}
+					if (retval != 0) throw new Exception("insert:"~ to!string(err));
     }
 		
 		retval= libsql_execute_stmt(insert_stmt, &err);
