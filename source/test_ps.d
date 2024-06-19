@@ -3,6 +3,7 @@ module source.test_ps;
 
 import libsql.deimos;
 import libsql.json;
+import libsql.orm;
 import libsql.utils;
 import core.stdc.stdio;
 import std.string:toStringz;

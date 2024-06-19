@@ -4,6 +4,7 @@ module libsql.traits;
 import libsql.deimos;
 import libsql.json;
 import libsql.utils;
+import libsql.orm;
 import core.stdc.stdio;
 import std.string:toStringz;
 import std.stdio;
@@ -38,16 +39,9 @@ unittest
 
   const string drop_table="DROP TABLE IF EXISTS Persons4;";
 	client.execute(drop_table);
+
+  client.create_table!Person("Persons4");
   
-	const string create_table = "CREATE TABLE Persons4(
-	name TEXT,
-	age INTEGER,
-	height REAL,
-	hobby TEXT
-	);";
-
-	client.execute(create_table);
-
 	char *err;
 
 	people[0] = Person("Paul", 20, 174.5,"chess");

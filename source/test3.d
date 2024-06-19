@@ -4,6 +4,7 @@ module source.test3;
 import libsql.deimos;
 import libsql.json;
 import libsql.utils;
+import libsql.orm;
 import core.stdc.stdio;
 import std.string:toStringz;
 import std.stdio;
