@@ -10,7 +10,7 @@
 		},
 		{
 			"name": "unittest",
-			"targetType": "library"
+			"sourcePaths":["test"]
 		}
 	],
 	"copyright": "Copyright © 2023, Pablo De Napoli",

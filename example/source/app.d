@@ -1,5 +1,5 @@
 import core.stdc.stdio;
-import libsql_deimos;
+import libsql.deimos;
 
 int main()
 {

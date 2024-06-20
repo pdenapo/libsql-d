@@ -1,6 +1,4 @@
 
-module libsql.traits;
-
 import libsql.deimos;
 import libsql.json;
 import libsql.utils;
