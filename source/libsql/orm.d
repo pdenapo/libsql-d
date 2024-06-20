@@ -12,8 +12,8 @@ class LibsqlClient {
 	libsql_database_t db;
 	libsql_connection_t conn;
 	bool print_sql;
-	 	
-	this(string url,string auth_token,bool print_sql=false)
+
+	void connect(string url,string auth_token,bool print_sql=false)
 	{
 		char* err;
 		this.print_sql=print_sql;
@@ -23,6 +23,8 @@ class LibsqlClient {
 		retval = libsql_connect(db, &conn, &err);
 		if (retval != 0) throw new Exception("libsql_connect error:"~ to!string(err));
 	}
+
+	this() {}
 
 	~this()
 	{
@@ -54,9 +56,11 @@ class LibsqlClient {
 		 return rows; 
 	}
 
-	void create_table (T)(string table)
+	
+
+	private void create_table_internal (T)(string table, string sql_inicial)
 	{
-	  string sql = "CREATE TABLE "~ table ~ "(";
+	  string sql = sql_inicial;
 
 	  foreach(i,member;__traits(allMembers, T))
     {
@@ -78,6 +82,18 @@ class LibsqlClient {
     }
 		sql ~= ");";
 		execute(sql);
+	}
+
+	void create_table(T)(string table)
+	{
+	  string sql = "CREATE TABLE IF NOT EXISTS "~ table ~ "(";
+	  create_table_internal !T(table,sql);
+	}
+
+	void create_table_if_not_exists(T)(string table)
+	{
+	  string sql = "CREATE TABLE IF NOT EXISTS "~ table ~ "(";
+	  create_table_internal !T(table,sql);
 	}
 
 	void insert (T)(T p, string table)

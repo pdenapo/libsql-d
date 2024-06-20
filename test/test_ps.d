@@ -33,7 +33,9 @@ unittest
 
 	const auth_token=  environment.get("LIBSQL_AUTH_TOKEN","");
 	
-	auto client= new LibsqlClient(url,auth_token,true);
+	auto client= new LibsqlClient();
+	
+	client.connect(url,auth_token,true);
 
   const string drop_table="DROP TABLE IF EXISTS Persons4;";
 	client.execute(drop_table);
