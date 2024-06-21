@@ -7,6 +7,13 @@ import std.stdio;
 import std.string:toStringz;
 import std.conv;
 import std.datetime.date;
+import std.traits;
+
+enum SQL;
+
+class SQLTable!T {
+		  string[] records;
+		}
 
 class LibsqlClient {
 	libsql_database_t db;
@@ -62,22 +69,31 @@ class LibsqlClient {
 	{
 	  string sql = sql_inicial;
 
-	  foreach(i,member;__traits(allMembers, T))
-    {
-					if (i>0) sql ~=",";
-					sql ~= member;
-					static if (__traits(isIntegral,typeof(__traits(getMember, T, member)))) 
-					{
-						sql ~=  " INTEGER NOT NULL ";   
-					}
-					else static if (is(typeof(__traits(getMember, T, member))==double))
-					{
-						sql ~=  " REAL NOT NULL ";
-					}
-					else					
+	  int col=0; // column number in the databse;
+	  foreach(member;__traits(allMembers, T))
+		{
+					//pragma(msg, member);
+					enum prot = __traits(getProtection,
+                             __traits(getMember, T, member));
+           // Only the public memeber of T are mapped to the database
+          static if (hasUDA!( __traits(getMember, T, member),SQL ) && (prot == "public")) {
+						//pragma(msg, typeof(__traits(getMember, T, member).stringof));
+						if (col>0) sql ~=",";
+						sql ~= member;
+						static if (__traits(isIntegral,typeof(__traits(getMember, T, member)))) 
+						{
+							sql ~=  " INTEGER NOT NULL ";   
+						}
+						else static if (is(typeof(__traits(getMember, T, member))==double))
+						{
+							sql ~=  " REAL NOT NULL ";
+						}
+						else					
 					//else static if (is(typeof(__traits(getMember, T, member))==string))
-					{
-						sql ~=  " TEXT NOT NULL ";
+						{
+							sql ~=  " TEXT NOT NULL ";
+						}
+						col++;
 					}
     }
 		sql ~= ");";
@@ -118,7 +134,10 @@ class LibsqlClient {
 
     foreach(i,member;__traits(allMembers, T))
     {
-    			debug writeln(member,"=",__traits(getMember, p, member)," ",typeof(__traits(getMember, p, member)).stringof);
+    			//debug writeln(member,"=",__traits(getMember, p, member)," ",typeof(__traits(getMember, p, member)).stringof);
+    			enum prot = __traits(getProtection,
+                             __traits(getMember, T, member));
+    			static if (hasUDA!( __traits(getMember, T, member),SQL ) && (prot == "public")) {
 					
 					// Integral types are represented using INTEGER 
 					
@@ -144,6 +163,7 @@ class LibsqlClient {
 						debug writeln("orm: ",member, "->STRING");
 					}
 					if (retval != 0) throw new Exception("insert:"~ to!string(err));
+					}
     }
 		
 		retval= libsql_execute_stmt(insert_stmt, &err);
@@ -155,6 +175,20 @@ class LibsqlClient {
 
 	}
 
+	void drop_table(string table_name)
+	{
+		const string drop_table="DROP TABLE "~table_name~";";
+		execute(drop_table);
+	}
+
+
+	void drop_table_if_exists(string table_name)
+	{
+		const string drop_table="DROP TABLE IF EXISTS "~table_name~";";
+		execute(drop_table);
+	}
+
+
 	T get(T)(libsql_row_t row)
 	{
 		T result;
@@ -164,8 +198,9 @@ class LibsqlClient {
 
     foreach(i,member;__traits(allMembers, T))
     {
-    			
-					
+    			enum prot = __traits(getProtection,
+                             __traits(getMember, T, member));
+    			static if (hasUDA!( __traits(getMember, T, member),SQL ) && (prot == "public")) {
 					// Integral types are represented using INTEGER 
 					
 					static if (__traits(isIntegral,typeof(__traits(getMember, T, member))))
@@ -209,8 +244,8 @@ class LibsqlClient {
 						if (retval != 0) throw new Exception("libsql_get_string:"~ to!string(err));
 						__traits(getMember, result, member) = DateTime.fromISOExtString(to!string(value));
 					 }
-
 					col++;
+					}
     }
 		
 		return result;

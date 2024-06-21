@@ -13,7 +13,7 @@ import std.datetime.date;
 
 // Test using some D constructions
 
-@("orm: Persons with D and prepared statements and traits")
+@("orm: create_table_if_not_exists")
 unittest
 {
 
@@ -45,7 +45,7 @@ unittest
   const string drop_table="DROP TABLE IF EXISTS Persons5;";
 	client.execute(drop_table);
 
-  client.create_table!Person("Persons5");
+  client.create_table_if_not_exists!Person("Persons5");
   
 	people[0] = Person("Paul", 52, 174.5,"chess",Date(1972,3,1), DateTime(2000, 6, 1, 10, 30, 0),true,3);
 	people[1] = Person("Laura",49, 161.0,"dancing",Date(1975,8,6),DateTime(2001, 7, 1, 11, 32, 5),false,5);

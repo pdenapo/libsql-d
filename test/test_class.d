@@ -13,23 +13,24 @@ import std.datetime.date;
 
 // Test using some D constructions
 
-@("orm: Persons with D and prepared statements and traits")
+@("orm: create_table_if_not_exists using classes")
 unittest
 {
 
-	struct Person
+	class Person
 	{
-		@SQL string name;
+		@SQL string name; 
 		@SQL int age;
-		@SQL double height;
-		@SQL string hobby;
-		@SQL Date bithday;
-		@SQL DateTime test;
-		@SQL bool married;
-		@SQL uint test_uint; 
+
+		this(string name,int age)
+		{
+		 this.name=name;
+		 this.age=age;
+		}
 	}
 
 	Person[2] people;
+	const table_name="Persons6";
 
 	libsql_rows_t rows;
 
@@ -42,24 +43,23 @@ unittest
 	
 	client.connect(url,auth_token,true);
 
-  const string drop_table="DROP TABLE IF EXISTS Persons5;";
-	client.execute(drop_table);
-
-  client.create_table!Person("Persons5");
+  client.drop_table_if_exists(table_name);
   
-	people[0] = Person("Paul", 52, 174.5,"chess",Date(1972,3,1), DateTime(2000, 6, 1, 10, 30, 0),true,3);
-	people[1] = Person("Laura",49, 161.0,"dancing",Date(1975,8,6),DateTime(2001, 7, 1, 11, 32, 5),false,5);
+  client.create_table_if_not_exists!Person(table_name);
+  
+	people[0] = new Person("Paul", 52);
+	people[1] = new Person("Laura",49);
 
 	
 foreach (p; people)
 	{
-		client.insert!Person(p,"Persons5");
+		client.insert!Person(p,table_name);
 	}
 
-	rows=client.query("SELECT * FROM Persons5;");
+	rows=client.query("SELECT * FROM "~ table_name~ ";");
 
 
-	int retval;
+  int retval;
 	char* err;
 	libsql_row_t row;
 	int i=0;
@@ -92,6 +92,6 @@ foreach (p; people)
 	// 	i++;
 	// }
 
-	libsql_free_rows(rows);
+	//libsql_free_rows(rows);
 	
 }
