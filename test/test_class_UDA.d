@@ -43,10 +43,11 @@ unittest
 	
 	client.connect(url,auth_token,true);
 
-  const string drop_table="DROP TABLE IF EXISTS "~table_name~";";
-	client.execute(drop_table);
+	auto table = new SQLTable!Person(client,table_name);
 
-  client.create_table_if_not_exists!Person(table_name);
+  table.drop_if_exists();
+  
+  table.create_if_not_exists();
   
 // 	people[0] = new Person("Paul", 52);
 // 	people[1] = new Person("Laura",49);

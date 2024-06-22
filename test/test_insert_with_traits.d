@@ -42,18 +42,22 @@ unittest
 	
 	client.connect(url,auth_token,true);
 
-  const string drop_table="DROP TABLE IF EXISTS Persons5;";
-	client.execute(drop_table);
+	
+	const string table_name="Persons5";
 
-  client.create_table!Person("Persons5");
+  auto table = new SQLTable!Person(client,table_name);
+
+  table.drop_if_exists();
   
+  table.create_if_not_exists();
+
 	people[0] = Person("Paul", 52, 174.5,"chess",Date(1972,3,1), DateTime(2000, 6, 1, 10, 30, 0),true,3);
 	people[1] = Person("Laura",49, 161.0,"dancing",Date(1975,8,6),DateTime(2001, 7, 1, 11, 32, 5),false,5);
 
 	
 foreach (p; people)
 	{
-		client.insert!Person(p,"Persons5");
+		table.insert(p);
 	}
 
 	rows=client.query("SELECT * FROM Persons5;");
